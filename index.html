@@ -17,16 +17,21 @@ canvas { width: 100%; height: 100% }
           var renderer = new THREE.WebGLRenderer();
           renderer.setSize(window.innerWidth, window.innerHeight);
           document.body.appendChild(renderer.domElement);
-          var geometry = new THREE.CylinderGeometry(1, 1, 4, 20, 1, true);
-          var material = new THREE.MeshBasicMaterial({color: 0x00ff00});
+          var geometry = new THREE.CylinderGeometry(2.25, 2.25, 4, 20, 1, true);
+          var material = new THREE.MeshBasicMaterial({color: 0x00ff00,
+              opacity: 0.5, transparent: true, wireframe: true});
           var cube = new THREE.Mesh(geometry, material);
           scene.add(cube);
-          camera.position.z = 5;
+          var linegeometry = new THREE.Geometry();
+          linegeometry.vertices.push(new THREE.Vector3(-2.25, -1.5, 0));
+          linegeometry.vertices.push(new THREE.Vector3(2.25, 2, 0));
+          var linematerial = new THREE.LineBasicMaterial({color:
+              0x0000ff});
+          var line = new THREE.Line(linegeometry, linematerial);
+          scene.add(line);
+          camera.position.z = 8;
           function render() {
               requestAnimationFrame(render);
-              cube.rotation.x += 0.005;
-              cube.rotation.y += 0.005;
-              cube.rotation.z += 0.005;
               renderer.render(scene, camera);
           };
           render();
