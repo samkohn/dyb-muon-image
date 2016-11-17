@@ -12,10 +12,12 @@ canvas { width: 100%; height: 100% }
         <script src="js/three.js/build/three.js"></script>
         <script src="js/three.js/examples/js/controls/OrbitControls.js"></script>
         <!-- Load in data from local JS file, var name is "data" -->
-        <script src="../data/test.js"></script>
+        <script src="../data/test2.js"></script>
         <script>
-          var track = data['Track'];
+          var simulated = data['simulated'];
+          var reconstructed = data['reconstructed'];
           var scene = new THREE.Scene();
+          scene.background = new THREE.Color(0xa7a7a7);
           var camera = new THREE.PerspectiveCamera(75,
                   window.innerWidth/window.innerHeight, 0.1, 1000);
           /*var camera = new THREE.OrthographicCamera(-20, 20, 20, -20,
@@ -23,20 +25,31 @@ canvas { width: 100%; height: 100% }
           var renderer = new THREE.WebGLRenderer();
           renderer.setSize(window.innerWidth, window.innerHeight);
           document.body.appendChild(renderer.domElement);
-          var geometry = new THREE.CylinderGeometry(2.25, 2.25, 4, 20, 1, true);
+          var cylindergeometry = new THREE.CylinderGeometry(2.25, 2.25, 4, 20, 1, true);
+          var texture = new THREE.Texture();
           var material = new THREE.MeshBasicMaterial({color: 0x00ff00,
-              opacity: 0.5, transparent: true, wireframe: true});
-          var cube = new THREE.Mesh(geometry, material);
+              side: THREE.DoubleSide, opacity: 0.5, transparent: true,
+              wireframe: true});
+          var cube = new THREE.Mesh(cylindergeometry, material);
           scene.add(cube);
-          var linegeometry = new THREE.Geometry();
-          linegeometry.vertices.push(new
-                  THREE.Vector3(track['yin'],track['zin'], track['xin']));
-          linegeometry.vertices.push(new THREE.Vector3(track['yout'],
-                      track['zout'], track['xout']));
-          var linematerial = new THREE.LineBasicMaterial({color:
-              0x0000ff});
-          var line = new THREE.Line(linegeometry, linematerial);
-          scene.add(line);
+          var simgeometry = new THREE.Geometry();
+          simgeometry.vertices.push(new
+                  THREE.Vector3(simulated['yin'],simulated['zin'], simulated['xin']));
+          simgeometry.vertices.push(new THREE.Vector3(simulated['yout'],
+                      simulated['zout'], simulated['xout']));
+          var simmaterial = new THREE.LineBasicMaterial({color:
+              0x0000ff, linewidth: 2});
+          var simline = new THREE.Line(simgeometry, simmaterial);
+          scene.add(simline);
+          var recogeometry = new THREE.Geometry();
+          recogeometry.vertices.push(new
+                  THREE.Vector3(reconstructed['yin'],reconstructed['zin'], reconstructed['xin']));
+          recogeometry.vertices.push(new THREE.Vector3(reconstructed['yout'],
+                      reconstructed['zout'], reconstructed['xout']));
+          var recomaterial = new THREE.LineBasicMaterial({color:
+              0xff0000, linewidth: 2});
+          var recoline = new THREE.Line(recogeometry, recomaterial);
+          scene.add(recoline);
           camera.position.z = 8;
           scene.add(camera);
           controls = new THREE.OrbitControls(camera);
