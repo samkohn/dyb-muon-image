@@ -60,6 +60,9 @@ canvas { width: 100%; height: 100% }
           z.onChange(function(value) {
               camera.position.z = value;
           });
+          var axes = new THREE.AxisHelper(1);
+          axes.position.set(-5, 0, 0);
+          scene.add(axes);
           function render() {
               requestAnimationFrame(render);
               controls.update();
