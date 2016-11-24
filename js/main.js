@@ -5,11 +5,30 @@ var cleartracks = function(scene) {
     }
     tracks = [];
 };
+var getfilename = function(params) {
+  name = ('../data/' + params['theta_prime'].toFixed(1) +
+          '_' + params['phi_prime'].toFixed(1) + '_' +
+          params['r0'].toFixed(1) + '_' +
+          params['phi0'].toFixed(1) + '.json');
+  console.log(name);
+  return name;
+};
 var addTracks = function(scene, data) {
-  var sim = loadtrack(scene, data['simulated'], 0xff0000);
-  var reco = loadtrack(scene, data['reconstructed'], 0x0000ff);
-  tracks.push(sim);
-  tracks.push(reco);
+  if(data.hasOwnProperty('ERROR'))
+  {
+      var track = loadtrack(scene, {
+          xin: -1, yin: -1, zin: -1,
+          xout: 1, yout: 1, zout: 1},
+          0x000000);
+      tracks.push(track);
+  }
+  else
+  {
+      var sim = loadtrack(scene, data['simulated'], 0xff0000);
+      var reco = loadtrack(scene, data['reconstructed'], 0x0000ff);
+      tracks.push(sim);
+      tracks.push(reco);
+  }
 };
 var loadtrack = function(scene, track, color) {
   var geometry = new THREE.Geometry();
@@ -29,31 +48,59 @@ var init = function() {
   scene.background = new THREE.Color(0xa7a7a7);
   var camera = new THREE.PerspectiveCamera(75,
           window.innerWidth/window.innerHeight, 0.1, 1000);
-  /*var camera = new THREE.OrthographicCamera(-20, 20, 20, -20,
-    -10, 10);*/
   var renderer = new THREE.WebGLRenderer();
   renderer.setSize(window.innerWidth, window.innerHeight);
   document.body.appendChild(renderer.domElement);
   var cylindergeometry = new THREE.CylinderGeometry(2.25, 2.25, 4, 20, 1, true);
-  var texture = new THREE.ImageUtils.loadTexture('../../../../../Desktop/calculated_oscillation_nu.png');
-  var material = new THREE.MeshBasicMaterial({map: texture,
-      side: THREE.DoubleSide, opacity: 0.5, transparent: true,
-      /*wireframe: true*/});
+  var material = new THREE.MeshBasicMaterial({
+      side: THREE.DoubleSide,
+      opacity: 0.3,
+      transparent: true,
+      color: 0xffffff
+  });
   var cube = new THREE.Mesh(cylindergeometry, material);
   scene.add(cube);
   camera.position.z = 8;
   scene.add(camera);
   controls = new THREE.OrbitControls(camera, renderer.domElement);
-  guiparams = {z: 8, file: 'test2.json'};
-  var gui = new dat.GUI();
-  var z = gui.add(guiparams, 'z', -10, 10);
-  var datfile = gui.add(guiparams, 'file');
-  z.onChange(function(value) {
-      camera.position.z = value;
+  guiparams = {
+      simulated: '#ff0000',
+      reconstructed: '#0000ff',
+      theta_prime: 0.3,
+      phi_prime: 0.7,
+      r0: 0,
+      phi0: 0.7
+  };
+  $.getJSON(getfilename(guiparams), function(data) {
+    addTracks(scene, data);
   });
-  datfile.onFinishChange(function(value) {
-      $.getJSON('../data/' + value, function(data) {
-          console.log(tracks);
+  var gui = new dat.GUI();
+  var thetaprime = gui.add(guiparams, 'theta_prime', 0, 1.20).step(0.3);
+  var phiprime = gui.add(guiparams, 'phi_prime', 0, 3).step(0.7);
+  var r0 = gui.add(guiparams, 'r0', 0, 2).step(0.5);
+  var phi0 = gui.add(guiparams, 'phi0', 0, 3).step(0.7);
+  gui.addColor(guiparams, 'simulated');
+  gui.addColor(guiparams, 'reconstructed');
+  thetaprime.onChange(function(value) {
+      $.getJSON(getfilename(guiparams), function(data) {
+          cleartracks(scene);
+          addTracks(scene, data);
+      });
+  });
+  phiprime.onChange(function(value) {
+      $.getJSON(getfilename(guiparams), function(data) {
+          cleartracks(scene);
+          addTracks(scene, data);
+      });
+  });
+  r0.onChange(function(value) {
+      $.getJSON(getfilename(guiparams), function(data) {
+          cleartracks(scene);
+          addTracks(scene, data);
+      });
+  });
+  phi0.onChange(function(value) {
+      $.getJSON(getfilename(guiparams), function(data) {
           cleartracks(scene);
           addTracks(scene, data);
       });
@@ -74,6 +121,3 @@ var init = function() {
 };
 //main
 var scene = init();
-$.getJSON('../data/test2.json', function(data) {
-  addTracks(scene, data);
-});
