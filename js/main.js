@@ -53,15 +53,19 @@ var init = function() {
   var renderer = new THREE.WebGLRenderer();
   renderer.setSize(window.innerWidth, window.innerHeight);
   document.body.appendChild(renderer.domElement);
-  var cylindergeometry = new THREE.CylinderGeometry(2.25, 2.25, 4, 20, 1, true);
+  var pmtcylindergeometry = new THREE.CylinderGeometry(2.3245, 2.3245, 4, 20, 1, true);
   var material = new THREE.MeshBasicMaterial({
       side: THREE.DoubleSide,
+      depthTest: false,
       opacity: 0.3,
       transparent: true,
       color: 0xffffff
   });
-  var cube = new THREE.Mesh(cylindergeometry, material);
-  scene.add(cube);
+  var pmtcylinder = new THREE.Mesh(pmtcylindergeometry, material);
+  var lscylindergeometry = new THREE.CylinderGeometry(2.0, 2.0, 4, 20, 1, true);
+  var lscylinder = new THREE.Mesh(lscylindergeometry, material);
+  scene.add(pmtcylinder);
+  scene.add(lscylinder);
   camera.position.z = 8;
   scene.add(camera);
   controls = new THREE.OrbitControls(camera, renderer.domElement);
