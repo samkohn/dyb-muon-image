@@ -1,4 +1,6 @@
 var tracks = [];
+var simTrackColor = 0xff0000;
+var recoTrackColor = 0x0000ff;
 var cleartracks = function(scene) {
     for(i in tracks) {
         scene.remove(tracks[i]);
@@ -24,8 +26,8 @@ var addTracks = function(scene, data) {
   }
   else
   {
-      var sim = loadtrack(scene, data['simulated'], 0xff0000);
-      var reco = loadtrack(scene, data['reconstructed'], 0x0000ff);
+      var sim = loadtrack(scene, data['simulated'], simTrackColor);
+      var reco = loadtrack(scene, data['reconstructed'], recoTrackColor);
       tracks.push(sim);
       tracks.push(reco);
   }
@@ -64,8 +66,8 @@ var init = function() {
   scene.add(camera);
   controls = new THREE.OrbitControls(camera, renderer.domElement);
   guiparams = {
-      simulated: '#ff0000',
-      reconstructed: '#0000ff',
+      simulated: simTrackColor,
+      reconstructed: recoTrackColor,
       theta_prime: 0.3,
       phi_prime: 0.7,
       r0: 0,
