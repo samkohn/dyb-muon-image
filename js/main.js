@@ -16,13 +16,17 @@ var getfilename = function(params) {
   return name;
 };
 var addTracks = function(scene, data) {
-  if(data.hasOwnProperty('ERROR'))
+  if(data['ERROR'] === 'reconstructor')
   {
-      var track = loadtrack(scene, {
-          xin: -1, yin: -1, zin: -1,
-          xout: 1, yout: 1, zout: 1},
-          0x000000);
-      tracks.push(track);
+      var sim = loadtrack(scene, data['simulated'],
+          simTrackColor);
+      tracks.push(sim);
+  }
+  else if(data['ERROR'] === 'simulator')
+  {
+      var sim = loadtrack(scene, data['simulated'],
+              0x00ff00);
+      tracks.push(sim);
   }
   else
   {
