@@ -72,6 +72,12 @@ var init = function() {
   scene.add(lscylinder);
   camera.position.z = 8;
   scene.add(camera);
+  var axes = new THREE.AxisHelper(1);
+  axes.position.set(-5, 0, 0);
+  scene.add(axes);
+  var rpcgrid = new THREE.GridHelper(6, 10, 0, 0);
+  rpcgrid.position.set(0, 4, 0);
+  scene.add(rpcgrid);
   controls = new THREE.OrbitControls(camera, renderer.domElement);
   guiparams = {
       simulated: simTrackColor,
@@ -79,7 +85,8 @@ var init = function() {
       theta_prime: 0.3,
       phi_prime: 0.7,
       r0: 0,
-      phi0: 0.7
+      phi0: 0.7,
+      show_rpc: true
   };
   $.getJSON(getfilename(guiparams), function(data) {
     addTracks(scene, data);
@@ -91,6 +98,7 @@ var init = function() {
   var phi0 = gui.add(guiparams, 'phi0', 0, 3).step(0.7);
   gui.addColor(guiparams, 'simulated');
   gui.addColor(guiparams, 'reconstructed');
+  var showrpc = gui.add(guiparams, 'show_rpc');
   thetaprime.onChange(function(value) {
       $.getJSON(getfilename(guiparams), function(data) {
           cleartracks(scene);
@@ -115,12 +123,14 @@ var init = function() {
           addTracks(scene, data);
       });
   });
-  var axes = new THREE.AxisHelper(1);
-  axes.position.set(-5, 0, 0);
-  scene.add(axes);
-  var rpcgrid = new THREE.GridHelper(6, 10, 0, 0);
-  rpcgrid.position.set(0, 4, 0);
-  scene.add(rpcgrid);
+  showrpc.onChange(function(value) {
+      if(value) {
+          scene.add(rpcgrid);
+      }
+      else {
+          scene.remove(rpcgrid);
+      }
+  });
   render = function () {
       requestAnimationFrame(render);
       controls.update();
