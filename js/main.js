@@ -41,8 +41,13 @@ var loadtrack = function(scene, track, color) {
           THREE.Vector3(track['yin'],track['zin'], track['xin']));
   geometry.vertices.push(new THREE.Vector3(track['yout'],
               track['zout'], track['xout']));
-  var material = new THREE.LineBasicMaterial({color:
-      color, linewidth: 2});
+  var material = new THREE.LineBasicMaterial({
+      color: color,
+      linewidth: 3,
+      depthTest: false,
+      opacity: 0.5,
+      transparent: true,
+  });
   var line = new THREE.Line(geometry, material);
   scene.add(line);
   return line;
