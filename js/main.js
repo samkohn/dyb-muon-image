@@ -83,7 +83,7 @@ var init = function() {
       simulated: simTrackColor,
       reconstructed: recoTrackColor,
       theta_prime: 0.3,
-      phi_prime: 0.7,
+      phi_prime: 0.6,
       r0: 0,
       phi0: 0.7,
       show_rpc: true
@@ -92,10 +92,10 @@ var init = function() {
     addTracks(scene, data);
   });
   var gui = new dat.GUI();
-  var thetaprime = gui.add(guiparams, 'theta_prime', 0, 1.20).step(0.3);
-  var phiprime = gui.add(guiparams, 'phi_prime', 0, 3).step(0.7);
-  var r0 = gui.add(guiparams, 'r0', 0, 2).step(0.5);
-  var phi0 = gui.add(guiparams, 'phi0', 0, 3).step(0.7);
+  var thetaprime = gui.add(guiparams, 'theta_prime', 0, 1.40).step(0.1);
+  var phiprime = gui.add(guiparams, 'phi_prime', 0, 2.7).step(0.3);
+  var r0 = gui.add(guiparams, 'r0', 0, 6).step(0.2);
+  var phi0 = gui.add(guiparams, 'phi0', 0, 2.8).step(0.7);
   gui.addColor(guiparams, 'simulated');
   gui.addColor(guiparams, 'reconstructed');
   var showrpc = gui.add(guiparams, 'show_rpc');
