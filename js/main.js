@@ -12,7 +12,6 @@ var getfilename = function(params) {
           '_' + params['phi_prime'].toFixed(1) + '_' +
           params['r0'].toFixed(1) + '_' +
           params['phi0'].toFixed(1) + '.json');
-  console.log(name);
   return name;
 };
 var addTracks = function(scene, data) {
@@ -99,30 +98,22 @@ var init = function() {
   gui.addColor(guiparams, 'simulated');
   gui.addColor(guiparams, 'reconstructed');
   var showrpc = gui.add(guiparams, 'show_rpc');
-  thetaprime.onChange(function(value) {
-      $.getJSON(getfilename(guiparams), function(data) {
-          cleartracks(scene);
-          addTracks(scene, data);
-      });
-  });
-  phiprime.onChange(function(value) {
-      $.getJSON(getfilename(guiparams), function(data) {
-          cleartracks(scene);
-          addTracks(scene, data);
-      });
-  });
-  r0.onChange(function(value) {
-      $.getJSON(getfilename(guiparams), function(data) {
-          cleartracks(scene);
-          addTracks(scene, data);
-      });
-  });
-  phi0.onChange(function(value) {
-      $.getJSON(getfilename(guiparams), function(data) {
-          cleartracks(scene);
-          addTracks(scene, data);
-      });
-  });
+  var currentfile = '';
+  var onParamChange = function(value) {
+      var newfile = getfilename(guiparams);
+      if(newfile === currentfile) { return; }
+      else {
+          $.getJSON(newfile, function(data) {
+              currentfile = newfile;
+              cleartracks(scene);
+              addTracks(scene, data);
+          });
+      }
+  };
+  thetaprime.onChange(onParamChange);
+  phiprime.onChange(onParamChange);
+  r0.onChange(onParamChange);
+  phi0.onChange(onParamChange);
   showrpc.onChange(function(value) {
       if(value) {
           scene.add(rpcgrid);
