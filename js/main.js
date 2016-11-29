@@ -1,6 +1,7 @@
 var tracks = [];
 var simTrackColor = 0xff0000;
 var recoTrackColor = 0x0000ff;
+var guessTrackColor = 0xff00ff;
 var cleartracks = function(scene) {
     for(i in tracks) {
         scene.remove(tracks[i]);
@@ -17,9 +18,10 @@ var getfilename = function(params) {
 var addTracks = function(scene, data) {
   if(data['ERROR'] === 'reconstructor')
   {
-      var sim = loadtrack(scene, data['simulated'],
-          simTrackColor);
+      var sim = loadtrack(scene, data['simulated'], simTrackColor);
+      var guess = loadtrack(scene, data['firstGuess'], guessTrackColor);
       tracks.push(sim);
+      tracks.push(guess);
   }
   else if(data['ERROR'] === 'simulator')
   {
@@ -27,12 +29,19 @@ var addTracks = function(scene, data) {
               0x00ff00);
       tracks.push(sim);
   }
+  else if(data['ERROR'] === 'roughtrack')
+  {
+      var sim = loadtrack(scene, data['simulated'], simTrackColor);
+      tracks.push(sim);
+  }
   else
   {
       var sim = loadtrack(scene, data['simulated'], simTrackColor);
       var reco = loadtrack(scene, data['reconstructed'], recoTrackColor);
+      var guess = loadtrack(scene, data['firstGuess'], guessTrackColor);
       tracks.push(sim);
       tracks.push(reco);
+      tracks.push(guess);
   }
 };
 var loadtrack = function(scene, track, color) {
@@ -85,6 +94,7 @@ var init = function() {
   guiparams = {
       simulated: simTrackColor,
       reconstructed: recoTrackColor,
+      fit_initialization: guessTrackColor,
       theta_prime: 0.3,
       phi_prime: 0.6,
       r0: 0,
@@ -101,6 +111,7 @@ var init = function() {
   var phi0 = gui.add(guiparams, 'phi0', 0, 2.8).step(0.7);
   gui.addColor(guiparams, 'simulated');
   gui.addColor(guiparams, 'reconstructed');
+  gui.addColor(guiparams, 'fit_initialization');
   var showrpc = gui.add(guiparams, 'show_rpc');
   var currentfile = '';
   var onParamChange = function(value) {
