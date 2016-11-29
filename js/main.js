@@ -76,7 +76,6 @@ var init = function() {
   scene.add(axes);
   var rpcgrid = new THREE.GridHelper(6, 10, 0, 0);
   rpcgrid.position.set(0, 4, 0);
-  scene.add(rpcgrid);
   controls = new THREE.OrbitControls(camera, renderer.domElement);
   guiparams = {
       simulated: simTrackColor,
@@ -85,7 +84,7 @@ var init = function() {
       phi_prime: 0.6,
       r0: 0,
       phi0: 0.7,
-      show_rpc: true
+      show_rpc: false
   };
   $.getJSON(getfilename(guiparams), function(data) {
     addTracks(scene, data);
@@ -93,7 +92,7 @@ var init = function() {
   var gui = new dat.GUI();
   var thetaprime = gui.add(guiparams, 'theta_prime', 0, 1.40).step(0.1);
   var phiprime = gui.add(guiparams, 'phi_prime', 0, 2.7).step(0.3);
-  var r0 = gui.add(guiparams, 'r0', 0, 6).step(0.2);
+  var r0 = gui.add(guiparams, 'r0', 0, 5.8).step(0.2);
   var phi0 = gui.add(guiparams, 'phi0', 0, 2.8).step(0.7);
   gui.addColor(guiparams, 'simulated');
   gui.addColor(guiparams, 'reconstructed');
