@@ -2,6 +2,9 @@ var tracks = [];
 var simTrackColor = 0xff0000;
 var recoTrackColor = 0x0000ff;
 var guessTrackColor = 0xff00ff;
+var getCSSColorString = function(hex) {
+    return '#' + (hex + 0x1000000).toString(16).substring(1);
+};
 var cleartracks = function(scene) {
     for(i in tracks) {
         scene.remove(tracks[i]);
@@ -61,6 +64,33 @@ var loadtrack = function(scene, track, color) {
   scene.add(line);
   return line;
 };
+var PMTTexture = function(data) {
+  var pmtcanvas = document.createElement('canvas');
+  pmtcanvas.width=64;
+  pmtcanvas.height=64;
+  ringheight = pmtcanvas.height/8.0;
+  columnwidth = pmtcanvas.width/24.0;
+  context = pmtcanvas.getContext('2d');
+  context.fillStyle = getCSSColorString(0x00ff00);
+  for(var ring = 0; ring < 8; ring++) {
+      for(var column = 0; column < 24; column++) {
+          context.fillStyle = getCSSColorString(0x00ff00 * ((ring + column) % 2));
+          var startx = column * columnwidth;
+          var starty = ring * ringheight;
+          context.fillRect(startx, starty, columnwidth, ringheight);
+      }
+  }
+  var pmttexture = new THREE.Texture(pmtcanvas);
+  pmttexture.needsUpdate = true;
+  var pmtmaterial = new THREE.MeshBasicMaterial({
+      side: THREE.DoubleSide,
+      depthTest: false,
+      opacity: 0.8,
+      transparent: true,
+      map: pmttexture
+  });
+  return pmtmaterial;
+};
 var render = 0;
 var init = function() {
   var scene = new THREE.Scene();
@@ -78,7 +108,7 @@ var init = function() {
       transparent: true,
       color: 0xffffff
   });
-  var pmtcylinder = new THREE.Mesh(pmtcylindergeometry, material);
+  var pmtcylinder = new THREE.Mesh(pmtcylindergeometry, PMTTexture());
   var lscylindergeometry = new THREE.CylinderGeometry(2.0, 2.0, 4, 20, 1, true);
   var lscylinder = new THREE.Mesh(lscylindergeometry, material);
   scene.add(pmtcylinder);
