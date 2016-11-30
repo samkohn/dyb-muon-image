@@ -64,38 +64,29 @@ var loadtrack = function(scene, track, color) {
   scene.add(line);
   return line;
 };
-var PMTTexture = function(ADData) {
-  var pmtcanvas = document.createElement('canvas');
-  pmtcanvas.width=64;
-  pmtcanvas.height=64;
-  ringheight = pmtcanvas.height/8.0;
-  columnwidth = pmtcanvas.width/24.0;
-  context = pmtcanvas.getContext('2d');
-  context.fillStyle = getCSSColorString(0x00ff00);
-  for(i in ADData['PMTs']) {
-      pmt = ADData['PMTs'][i];
-      ring = pmt['r'];
-      column = pmt['c'];
-      // TODO use a reasonable color scale (this one is terrible)
-      color = 0x100 - Math.floor(0x100 * (pmt['q'] / 2000.0));
-      color += color * 0x100 + color * 0x10000;
-      console.log(color.toString(16));
-      context.fillStyle = getCSSColorString(color);
-      var startx = column * columnwidth;
-      var starty = ring * ringheight;
-      context.fillRect(startx, starty, columnwidth, ringheight);
+var addPMTs = function(scene, data) {
+
+  height = 4;
+  radius = 2.3245;
+  AD = data['AD']
+  for(i in AD['PMTs']) {
+    pmt = AD['PMTs'][i];
+    pmtx = pmt['y'];
+    pmty = pmt['z'];
+    pmtz = pmt['x'];
+    // TODO use a reasonable color scale (this one is terrible)
+    color = 0x100 - Math.floor(0x100 * (pmt['q'] / 1500.0));
+    color += color * 0x100;// + color * 0x10000;
+    var pmtgeometry = new THREE.SphereGeometry(0.2);
+    var pmtmaterial = new THREE.MeshBasicMaterial({
+      color: color,
+      transparent: false
+    });
+    var pmt = new THREE.Mesh(pmtgeometry, pmtmaterial);
+    pmt.position.set(pmtx, pmty, pmtz);
+    scene.add(pmt);
+    eventObjects.push(pmt);
   }
-  var pmttexture = new THREE.Texture(pmtcanvas);
-  pmttexture.needsUpdate = true;
-  pmttexture.magFilter = THREE.NearestFilter;
-  var pmtmaterial = new THREE.MeshBasicMaterial({
-      side: THREE.DoubleSide,
-      depthTest: false,
-      opacity: 0.8,
-      transparent: true,
-      map: pmttexture
-  });
-  return pmtmaterial;
 };
 var render = 0;
 var init = function() {
@@ -106,7 +97,6 @@ var init = function() {
   var renderer = new THREE.WebGLRenderer();
   renderer.setSize(window.innerWidth, window.innerHeight);
   document.body.appendChild(renderer.domElement);
-  var pmtcylindergeometry = new THREE.CylinderGeometry(2.3245, 2.3245, 4, 20, 1, true);
   var material = new THREE.MeshBasicMaterial({
       side: THREE.DoubleSide,
       depthTest: false,
@@ -154,9 +144,7 @@ var init = function() {
               clearEventObjects(scene);
               addTracks(scene, data);
               // Set up the PMT cylinder
-              var pmtcylinder = new THREE.Mesh(pmtcylindergeometry, PMTTexture(data['AD']));
-              scene.add(pmtcylinder);
-              eventObjects.push(pmtcylinder);
+        addPMTs(scene, data);
           });
       }
   };
