@@ -75,7 +75,6 @@ var addPMTs = function(scene, data) {
     maxcharge = charge > maxcharge ? charge : maxcharge;
     mincharge = charge < mincharge ? charge : mincharge;
   }
-  console.log(mincharge);
   scale = chroma.scale(['black', 'red', 'yellow', 'white'])
     .correctLightness(true)
     .domain([mintime, maxtime]); // range of input values
@@ -129,7 +128,7 @@ var init = function() {
   var lscylinder = new THREE.Mesh(lscylindergeometry, material);
   camera.position.z = 8;
   scene.add(camera);
-  var axes = new THREE.AxisHelper(1);
+  var axes = new THREE.AxisHelper(0.5);
   axes.position.set(-5, 0, 0);
   scene.add(axes);
   var rpcgrid = new THREE.GridHelper(6, 10, 0, 0);
