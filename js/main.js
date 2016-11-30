@@ -2,9 +2,6 @@ var eventObjects = [];
 var simTrackColor = 0xff0000;
 var recoTrackColor = 0x0000ff;
 var guessTrackColor = 0xff00ff;
-var getCSSColorString = function(hex) {
-  return '#' + (hex + 0x1000000).toString(16).substring(1);
-};
 var clearEventObjects = function(scene) {
   for(i in eventObjects) {
     scene.remove(eventObjects[i]);
@@ -66,20 +63,18 @@ var loadtrack = function(scene, track, color) {
 };
 var addPMTs = function(scene, data) {
 
-  height = 4;
-  radius = 2.3245;
-  AD = data['AD']
+  AD = data['AD'];
+  scale = chroma.scale(['black', 'red', 'yellow', 'white'])
+      .correctLightness(true)
+      .domain([200, 1500]); // range of input values
   for(i in AD['PMTs']) {
     pmt = AD['PMTs'][i];
     pmtx = pmt['y'];
     pmty = pmt['z'];
     pmtz = pmt['x'];
-    // TODO use a reasonable color scale (this one is terrible)
-    color = 0x100 - Math.floor(0x100 * (pmt['q'] / 1500.0));
-    color += color * 0x100;// + color * 0x10000;
-    var pmtgeometry = new THREE.SphereGeometry(0.2);
+    var pmtgeometry = new THREE.SphereGeometry(0.15);
     var pmtmaterial = new THREE.MeshBasicMaterial({
-      color: color,
+      color: scale(pmt['q']).hex(),
       transparent: false
     });
     var pmt = new THREE.Mesh(pmtgeometry, pmtmaterial);
