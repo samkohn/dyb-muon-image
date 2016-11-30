@@ -1,15 +1,15 @@
-var tracks = [];
+var eventObjects = [];
 var simTrackColor = 0xff0000;
 var recoTrackColor = 0x0000ff;
 var guessTrackColor = 0xff00ff;
 var getCSSColorString = function(hex) {
     return '#' + (hex + 0x1000000).toString(16).substring(1);
 };
-var cleartracks = function(scene) {
-    for(i in tracks) {
-        scene.remove(tracks[i]);
+var clearEventObjects = function(scene) {
+    for(i in eventObjects) {
+        scene.remove(eventObjects[i]);
     }
-    tracks = [];
+    eventObjects = [];
 };
 var getfilename = function(params) {
   name = ('../data/' + params['theta_prime'].toFixed(1) +
@@ -23,28 +23,28 @@ var addTracks = function(scene, data) {
   {
       var sim = loadtrack(scene, data['simulated'], simTrackColor);
       var guess = loadtrack(scene, data['firstGuess'], guessTrackColor);
-      tracks.push(sim);
-      tracks.push(guess);
+      eventObjects.push(sim);
+      eventObjects.push(guess);
   }
   else if(data['ERROR'] === 'simulator')
   {
       var sim = loadtrack(scene, data['simulated'],
               0x00ff00);
-      tracks.push(sim);
+      eventObjects.push(sim);
   }
   else if(data['ERROR'] === 'roughtrack')
   {
       var sim = loadtrack(scene, data['simulated'], simTrackColor);
-      tracks.push(sim);
+      eventObjects.push(sim);
   }
   else
   {
       var sim = loadtrack(scene, data['simulated'], simTrackColor);
       var reco = loadtrack(scene, data['reconstructed'], recoTrackColor);
       var guess = loadtrack(scene, data['firstGuess'], guessTrackColor);
-      tracks.push(sim);
-      tracks.push(reco);
-      tracks.push(guess);
+      eventObjects.push(sim);
+      eventObjects.push(reco);
+      eventObjects.push(guess);
   }
 };
 var loadtrack = function(scene, track, color) {
@@ -64,7 +64,7 @@ var loadtrack = function(scene, track, color) {
   scene.add(line);
   return line;
 };
-var PMTTexture = function(data) {
+var PMTTexture = function(ADData) {
   var pmtcanvas = document.createElement('canvas');
   pmtcanvas.width=64;
   pmtcanvas.height=64;
@@ -72,16 +72,22 @@ var PMTTexture = function(data) {
   columnwidth = pmtcanvas.width/24.0;
   context = pmtcanvas.getContext('2d');
   context.fillStyle = getCSSColorString(0x00ff00);
-  for(var ring = 0; ring < 8; ring++) {
-      for(var column = 0; column < 24; column++) {
-          context.fillStyle = getCSSColorString(0x00ff00 * ((ring + column) % 2));
-          var startx = column * columnwidth;
-          var starty = ring * ringheight;
-          context.fillRect(startx, starty, columnwidth, ringheight);
-      }
+  for(i in ADData['PMTs']) {
+      pmt = ADData['PMTs'][i];
+      ring = pmt['r'];
+      column = pmt['c'];
+      // TODO use a reasonable color scale (this one is terrible)
+      color = 0x100 - Math.floor(0x100 * (pmt['q'] / 2000.0));
+      color += color * 0x100 + color * 0x10000;
+      console.log(color.toString(16));
+      context.fillStyle = getCSSColorString(color);
+      var startx = column * columnwidth;
+      var starty = ring * ringheight;
+      context.fillRect(startx, starty, columnwidth, ringheight);
   }
   var pmttexture = new THREE.Texture(pmtcanvas);
   pmttexture.needsUpdate = true;
+  pmttexture.magFilter = THREE.NearestFilter;
   var pmtmaterial = new THREE.MeshBasicMaterial({
       side: THREE.DoubleSide,
       depthTest: false,
@@ -108,10 +114,8 @@ var init = function() {
       transparent: true,
       color: 0xffffff
   });
-  var pmtcylinder = new THREE.Mesh(pmtcylindergeometry, PMTTexture());
   var lscylindergeometry = new THREE.CylinderGeometry(2.0, 2.0, 4, 20, 1, true);
   var lscylinder = new THREE.Mesh(lscylindergeometry, material);
-  scene.add(pmtcylinder);
   scene.add(lscylinder);
   camera.position.z = 8;
   scene.add(camera);
@@ -131,9 +135,6 @@ var init = function() {
       phi0: 0.7,
       show_rpc: false
   };
-  $.getJSON(getfilename(guiparams), function(data) {
-    addTracks(scene, data);
-  });
   var gui = new dat.GUI();
   var thetaprime = gui.add(guiparams, 'theta_prime', 0, 1.40).step(0.1);
   var phiprime = gui.add(guiparams, 'phi_prime', 0, 2.7).step(0.3);
@@ -150,8 +151,12 @@ var init = function() {
       else {
           $.getJSON(newfile, function(data) {
               currentfile = newfile;
-              cleartracks(scene);
+              clearEventObjects(scene);
               addTracks(scene, data);
+              // Set up the PMT cylinder
+              var pmtcylinder = new THREE.Mesh(pmtcylindergeometry, PMTTexture(data['AD']));
+              scene.add(pmtcylinder);
+              eventObjects.push(pmtcylinder);
           });
       }
   };
@@ -167,6 +172,8 @@ var init = function() {
           scene.remove(rpcgrid);
       }
   });
+  // Set up the first tracks
+  onParamChange();
   render = function () {
       requestAnimationFrame(render);
       controls.update();
