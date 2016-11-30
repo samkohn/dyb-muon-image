@@ -87,8 +87,22 @@ var addPMTs = function(scene, data) {
     var pmtgeometry = new THREE.SphereGeometry(pmt['q'] /7000, 4, 3);
     var pmtmaterial = new THREE.MeshBasicMaterial({
       color: scale(pmt['t']).hex(),
-      transparent: false
+      transparent: true,
+      opacity: 0.9
     });
+    if (pmt['r'] === 0 && pmt['c'] === 0) {
+      pmtmaterial.wireframe = true;
+    }
+    if(pmt['r'] === 0 && pmt['c'] === 1) {
+      // add a wireframe outline
+      pmt2geometry = new THREE.SphereGeometry(pmt['q']/6900, 4, 3);
+      pmt2material = new THREE.MeshBasicMaterial({ color: 0 });
+      pmt2material.wireframe = true;
+      pmt2 = new THREE.Mesh(pmt2geometry, pmt2material);
+      pmt2.position.set(pmtx, pmty, pmtz);
+      scene.add(pmt2);
+      eventObjects.push(pmt2);
+    }
     var pmt = new THREE.Mesh(pmtgeometry, pmtmaterial);
     pmt.position.set(pmtx, pmty, pmtz);
     scene.add(pmt);
