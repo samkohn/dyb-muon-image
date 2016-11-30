@@ -62,19 +62,31 @@ var loadtrack = function(scene, track, color) {
   return line;
 };
 var addPMTs = function(scene, data) {
-
   AD = data['AD'];
+  maxtime = -1e20;
+  mintime = 1e20;
+  maxcharge = -1e20;
+  mincharge = 1e20;
+  for(i in AD['PMTs']) {
+      charge = AD['PMTs'][i]['q'];
+      time = AD['PMTs'][i]['t'];
+      maxtime = time > maxtime ? time : maxtime;
+      mintime = time < mintime ? time : mintime;
+      maxcharge = charge > maxcharge ? charge : maxcharge;
+      mincharge = charge < mincharge ? charge : mincharge;
+  }
+  console.log(mincharge);
   scale = chroma.scale(['black', 'red', 'yellow', 'white'])
       .correctLightness(true)
-      .domain([200, 1500]); // range of input values
+      .domain([mintime, maxtime]); // range of input values
   for(i in AD['PMTs']) {
     pmt = AD['PMTs'][i];
     pmtx = pmt['y'];
     pmty = pmt['z'];
     pmtz = pmt['x'];
-    var pmtgeometry = new THREE.SphereGeometry(0.15);
+    var pmtgeometry = new THREE.SphereGeometry(pmt['q'] /7000, 4, 4);
     var pmtmaterial = new THREE.MeshBasicMaterial({
-      color: scale(pmt['q']).hex(),
+      color: scale(pmt['t']).hex(),
       transparent: false
     });
     var pmt = new THREE.Mesh(pmtgeometry, pmtmaterial);
