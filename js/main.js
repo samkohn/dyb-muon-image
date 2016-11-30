@@ -84,7 +84,7 @@ var addPMTs = function(scene, data) {
     pmtx = pmt['y'];
     pmty = pmt['z'];
     pmtz = pmt['x'];
-    var pmtgeometry = new THREE.SphereGeometry(pmt['q'] /7000, 4, 4);
+    var pmtgeometry = new THREE.SphereGeometry(pmt['q'] /7000, 4, 3);
     var pmtmaterial = new THREE.MeshBasicMaterial({
       color: scale(pmt['t']).hex(),
       transparent: false
@@ -113,7 +113,6 @@ var init = function() {
   });
   var lscylindergeometry = new THREE.CylinderGeometry(2.0, 2.0, 4, 20, 1, true);
   var lscylinder = new THREE.Mesh(lscylindergeometry, material);
-  scene.add(lscylinder);
   camera.position.z = 8;
   scene.add(camera);
   var axes = new THREE.AxisHelper(1);
@@ -130,7 +129,8 @@ var init = function() {
     phi_prime: 0.6,
     r0: 0,
     phi0: 0.7,
-    show_rpc: false
+    show_rpc: false,
+    show_ls: false
   };
   var gui = new dat.GUI();
   var thetaprime = gui.add(guiparams, 'theta_prime', 0, 1.40).step(0.1);
@@ -141,6 +141,7 @@ var init = function() {
   gui.addColor(guiparams, 'reconstructed');
   gui.addColor(guiparams, 'fit_initialization');
   var showrpc = gui.add(guiparams, 'show_rpc');
+  var showls = gui.add(guiparams, 'show_ls');
   var currentfile = '';
   var onParamChange = function(value) {
     var newfile = getfilename(guiparams);
@@ -165,6 +166,14 @@ var init = function() {
     }
     else {
       scene.remove(rpcgrid);
+    }
+  });
+  showls.onChange(function(value) {
+    if(value) {
+      scene.add(lscylinder);
+    }
+    else {
+      scene.remove(lscylinder);
     }
   });
   // Set up the first tracks
