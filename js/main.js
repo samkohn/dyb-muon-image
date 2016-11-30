@@ -68,17 +68,17 @@ var addPMTs = function(scene, data) {
   maxcharge = -1e20;
   mincharge = 1e20;
   for(i in AD['PMTs']) {
-      charge = AD['PMTs'][i]['q'];
-      time = AD['PMTs'][i]['t'];
-      maxtime = time > maxtime ? time : maxtime;
-      mintime = time < mintime ? time : mintime;
-      maxcharge = charge > maxcharge ? charge : maxcharge;
-      mincharge = charge < mincharge ? charge : mincharge;
+    charge = AD['PMTs'][i]['q'];
+    time = AD['PMTs'][i]['t'];
+    maxtime = time > maxtime ? time : maxtime;
+    mintime = time < mintime ? time : mintime;
+    maxcharge = charge > maxcharge ? charge : maxcharge;
+    mincharge = charge < mincharge ? charge : mincharge;
   }
   console.log(mincharge);
   scale = chroma.scale(['black', 'red', 'yellow', 'white'])
-      .correctLightness(true)
-      .domain([mintime, maxtime]); // range of input values
+    .correctLightness(true)
+    .domain([mintime, maxtime]); // range of input values
   for(i in AD['PMTs']) {
     pmt = AD['PMTs'][i];
     pmtx = pmt['y'];
