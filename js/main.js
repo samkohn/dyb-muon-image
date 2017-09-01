@@ -30,7 +30,7 @@ var clearEventObjects = function(scene) {
 };
 // Construct the file name corresponding to the selected parameters
 var getfilename = function(params) {
-  name = ('../data/' + params['theta_prime'].toFixed(1) +
+  name = ('data/' + params['theta_prime'].toFixed(1) +
       '_' + params['phi_prime'].toFixed(1) + '_' +
       params['r0'].toFixed(1) + '_' +
       params['phi0'].toFixed(1) + '.json');
