@@ -1,1 +1,2 @@
-js/lib
+data/*
+.DS_STORE
