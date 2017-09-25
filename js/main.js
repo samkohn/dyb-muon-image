@@ -182,10 +182,10 @@ var init = function() {
     simulated: simTrackColor,
     reconstructed: recoTrackColor,
     fit_initialization: guessTrackColor,
-    theta_prime: 0.3,
-    phi_prime: 0.6,
-    r0: 0,
-    phi0: 0.7,
+    theta_prime: 0.4,
+    phi_prime: 2.1,
+    r0: 0.2,
+    phi0: 0.0,
     show_rpc: false,
     show_ls: false
   };
