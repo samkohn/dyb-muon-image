@@ -195,9 +195,9 @@ var init = function() {
   var phiprime = gui.add(guiparams, 'phi_prime', 0, 2.7).step(0.3);
   var r0 = gui.add(guiparams, 'r0', 0, 5.8).step(0.2);
   var phi0 = gui.add(guiparams, 'phi0', 0, 2.8).step(0.7);
-  gui.addColor(guiparams, 'simulated');
-  gui.addColor(guiparams, 'reconstructed');
-  gui.addColor(guiparams, 'fit_initialization');
+  var simulated_color = gui.addColor(guiparams, 'simulated');
+  var reconstructed_color = gui.addColor(guiparams, 'reconstructed');
+  var guess_color = gui.addColor(guiparams, 'fit_initialization');
   var showrpc = gui.add(guiparams, 'show_rpc');
   var showls = gui.add(guiparams, 'show_ls');
   var currentfile = '';
@@ -221,6 +221,15 @@ var init = function() {
   phiprime.onChange(onParamChange);
   r0.onChange(onParamChange);
   phi0.onChange(onParamChange);
+  simulated_color.onChange(function(value) {
+    guiparams['simulated'] = simTrackColor;
+  });
+  reconstructed_color.onChange(function(value) {
+    guiparams['reconstructed'] = recoTrackColor;
+  });
+  guess_color.onChange(function(value) {
+    guiparams['fit_initialization'] = guessTrackColor;
+  });
   showrpc.onChange(function(value) {
     if(value) {
       scene.add(rpcgrid);
